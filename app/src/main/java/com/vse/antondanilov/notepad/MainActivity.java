@@ -42,8 +42,16 @@ public class MainActivity extends AppCompatActivity {
      generateTableItems();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //update
+        generateTableItems();
+    }
+
     private void generateTableItems() {
         TableLayout table = (TableLayout) this.findViewById(R.id.main_menu_table);
+        table.removeAllViews();
 
         for(final Note note : DB.getNotes()) {
             LinearLayout tableRow = (LinearLayout) View.inflate(this, R.layout.main_menu_item, null);
@@ -51,8 +59,7 @@ public class MainActivity extends AppCompatActivity {
             Random rand = new Random();
             int k = rand.nextInt(9);
 
-            System.out.println("COLOR: "+ note.getColor());
-            tableRow.setBackgroundColor(Color.parseColor("#" + note.getColor()));
+            tableRow.setBackgroundColor(Color.parseColor(note.getHexColor()));
             TextView title = (TextView)tableRow.findViewById(R.id.note_title);
             TextView noteText = (TextView)tableRow.findViewById(R.id.note_text);
 

@@ -12,6 +12,10 @@ public class Database {
     private static List<Note> notes;
 
     public Database() {
+       generateDB();
+    }
+
+    private static void generateDB() {
         notes = new ArrayList<>();
         for(int i = 0; i < 25; i++) {
             String t = i % 2 == 0 ? "Bureš" : "Eman";
@@ -20,7 +24,7 @@ public class Database {
         }
     }
 
-    public List<Note> getNotes() {
+    public static List<Note> getNotes() {
         return notes;
     }
 }

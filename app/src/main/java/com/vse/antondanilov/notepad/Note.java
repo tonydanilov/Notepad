@@ -41,12 +41,24 @@ public class Note {
         return text;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
     public boolean isCheckboxes() {
         return checkboxes;
     }
 
     public int getColor() {
         return color;
+    }
+
+    public String getHexColor() {
+        return "#" + color;
     }
 
     public void setColor(int color) {
