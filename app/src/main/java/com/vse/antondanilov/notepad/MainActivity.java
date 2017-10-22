@@ -13,11 +13,13 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import java.util.List;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
     public static Database DB;
+    public static String    NOTE_ID = "note_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DB = new Database();
+        DB = new Database(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.new_note_button);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -34,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                //         .setAction("Action", null).show();
-
+                System.out.println("== NOTE creating new note");
                 showNote(-1);
             }
         });
@@ -53,15 +55,16 @@ public class MainActivity extends AppCompatActivity {
         TableLayout table = (TableLayout) this.findViewById(R.id.main_menu_table);
         table.removeAllViews();
 
-        for(final Note note : DB.getNotes()) {
+        final List<Note> notes = DB.getNotes();
+        for(final Note note : notes) {
             LinearLayout tableRow = (LinearLayout) View.inflate(this, R.layout.main_menu_item, null);
 
             Random rand = new Random();
             int k = rand.nextInt(9);
 
             tableRow.setBackgroundColor(Color.parseColor(note.getHexColor()));
-            TextView title = (TextView)tableRow.findViewById(R.id.note_title);
-            TextView noteText = (TextView)tableRow.findViewById(R.id.note_text);
+            TextView title = tableRow.findViewById(R.id.note_title);
+            TextView noteText = tableRow.findViewById(R.id.note_text);
 
             title.setText(note.getTitle());
             noteText.setPadding(noteText.getPaddingLeft(), 0,0, k * 100);
@@ -72,16 +75,15 @@ public class MainActivity extends AppCompatActivity {
             tableRow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showNote(DB.getNotes().indexOf(note));
+                    showNote(notes.indexOf(note));
                 }
             });
         }
-
     }
 
     private void showNote(int noteId) {
         Intent intent = new Intent(MainActivity.this, NewNoteActivity.class);
-        if(noteId != -1) intent.putExtra("noteId", noteId);
+        intent.putExtra(NOTE_ID, noteId);
         startActivity(intent);
     }
 
@@ -105,5 +107,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public static Database getDB() {
+        return DB;
     }
 }

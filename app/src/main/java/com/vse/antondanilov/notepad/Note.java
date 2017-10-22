@@ -7,20 +7,26 @@ import java.util.Random;
  */
 
 public class Note {
+    private int id;
     private String title;
     private String text;
-    private boolean checkboxes;
-    private int color;
+    private boolean checkbox;
+    private NoteColor color;
 
-    public Note(String title, String text, boolean checkboxes) {
+    public Note(int id, String title, String text, NoteColor color, boolean checkbox) {
+        this.id = id;
         this.title = title;
         this.text = text;
-        this.checkboxes = checkboxes;
-        this.color = randomizeColor();
+        this.checkbox = checkbox;
+        this.color = color;
     }
 
-    public Note(String text, boolean checkboxes) {
-        new Note("", text, checkboxes);
+    public Note(int id, String text, NoteColor color, boolean checkbox) {
+        new Note(id, "", text, color, checkbox);
+    }
+
+    public Note(int id, String text, boolean checkbox) {
+        new Note(id, "", text, NoteColor.WHITE, checkbox);
     }
 
     private int randomizeColor() {
@@ -31,6 +37,10 @@ public class Note {
         }
         while(returnColor < 10000000) returnColor *= 10;
         return returnColor;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -49,19 +59,19 @@ public class Note {
         this.text = text;
     }
 
-    public boolean isCheckboxes() {
-        return checkboxes;
+    public boolean isCheckbox() {
+        return checkbox;
     }
 
-    public int getColor() {
+    public NoteColor getColor() {
         return color;
     }
 
     public String getHexColor() {
-        return "#" + color;
+        return color.getHexColor();
     }
 
-    public void setColor(int color) {
+    public void setColor(NoteColor color) {
         this.color = color;
     }
 
