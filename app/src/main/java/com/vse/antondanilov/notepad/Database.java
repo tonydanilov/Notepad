@@ -69,7 +69,6 @@ public class Database extends SQLiteOpenHelper {
         List<Note> returnNotes = new ArrayList<>();
 
         Cursor cur = db.rawQuery("SELECT * FROM " + TABLE_NOTES, null);
-
         if(cur.moveToFirst()) {
             do{
                 int id = Integer.parseInt(cur.getString(0));
@@ -84,7 +83,7 @@ public class Database extends SQLiteOpenHelper {
         return returnNotes;
     }
 
-    private void insertNewNote(Note note) {
+    void insertNewNote(Note note) {
         ContentValues values = new ContentValues();
         values.put(COLUMN_TITLE, note.getTitle());
         values.put(COLUMN_TEXT, note.getText());
@@ -94,7 +93,7 @@ public class Database extends SQLiteOpenHelper {
         db.insert(TABLE_NOTES, null, values);
     }
 
-    public void updateNote(Note note) {
+    void updateNote(Note note) {
         ContentValues values = new ContentValues();
         values.put(COLUMN_TITLE, note.getTitle());
         values.put(COLUMN_TEXT, note.getText());
