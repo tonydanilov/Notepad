@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.ContactsContract;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,15 +22,23 @@ public class Database extends SQLiteOpenHelper {
     private static final int    DATABASE_VERSION    = 1;
     private static final String DATABASE_NAME       = "notes_DB";
     private static final String TABLE_NOTES         = "notes";
+    private static final String TABLE_HASHTAGS      = "hashtags";
+    private static final String TABLE_NOTES_HASHTAGS= "notes_hashtags";
     private static final String COLUMN_ID           = "id";
+    private static final String COLUMN_NOTES_ID     = "notes_id";
+    private static final String COLUMN_HASHTAGS_ID  = "hashtags_id";
     private static final String COLUMN_TITLE        = "note_title";
     private static final String COLUMN_TEXT         = "note_text";
     private static final String COLUMN_COLOR        = "note_color";
     private static final String COLUMN_CHECKBOXES   = "note_checkboxes";
+    private static final String COLUMN_NAME         = "hashtag_name";
+
+    //TODO všechny sql dotazy do proměnných
 
     public Database(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         generateRandomValues();
+        addDefaultHashtags();
     }
 
     private void generateRandomValues() {
@@ -45,8 +54,29 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
+    private void addDefaultHashtags() {
+        if(getHashtags().size()>=3) return;
+        Hashtag hashtag1 = new Hashtag(-1, "WORK");
+        insertNewHashtag(hashtag1);
+
+        Hashtag hashtag2 = new Hashtag(-1, "SCHOOL");
+        insertNewHashtag(hashtag2);
+
+        Hashtag hashtag3 = new Hashtag(-1, "INSPIRATION");
+        insertNewHashtag(hashtag3);
+
+    }
+
     public List<Note> getNotes() {
         return selectAllNotes();
+    }
+
+    public List<Hashtag> getHashtags() {
+        return selectAllHashtags();
+    }
+
+    public List<Hashtag> getHashtagsForNote(int noteId) {
+        return selectHashtagsForNote(noteId);
     }
 
     @Override
@@ -54,7 +84,18 @@ public class Database extends SQLiteOpenHelper {
         String CREATE_NOTES_TABLE = "CREATE TABLE " + TABLE_NOTES + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_TITLE + " TEXT," +
                 COLUMN_TEXT+ " TEXT," + COLUMN_COLOR + " INTEGER," + COLUMN_CHECKBOXES + " BOOLEAN" + ")";
+
+        String CREATE_HASHTAGS_TABLE = "CREATE TABLE " + TABLE_HASHTAGS + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_NAME + " TEXT)";
+
+        String CREATE_NOTES_HASHTAGS_TABLE = "CREATE TABLE " + TABLE_NOTES_HASHTAGS + "(" +
+                COLUMN_NOTES_ID + " INTEGER," + COLUMN_HASHTAGS_ID + " INTEGER, FOREIGN KEY (" + COLUMN_NOTES_ID + ") REFERENCES " +
+                TABLE_NOTES + "(" + COLUMN_ID + "), FOREIGN KEY (" + COLUMN_HASHTAGS_ID + ") REFERENCES " + TABLE_HASHTAGS +
+                "(" + COLUMN_ID + "))";
+
         db.execSQL(CREATE_NOTES_TABLE);
+        db.execSQL(CREATE_HASHTAGS_TABLE);
+        db.execSQL(CREATE_NOTES_HASHTAGS_TABLE);
     }
 
     //TODO do I need it?
@@ -83,6 +124,40 @@ public class Database extends SQLiteOpenHelper {
         return returnNotes;
     }
 
+    private List<Hashtag> selectAllHashtags() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Hashtag> returnHashtags = new ArrayList<>();
+
+        Cursor cur = db.rawQuery("SELECT * FROM " + TABLE_HASHTAGS, null);
+        if(cur.moveToFirst()) {
+            do{
+                int id = Integer.parseInt(cur.getString(0));
+                String name = cur.getString(1);
+                returnHashtags.add(new Hashtag(id,name));
+            } while (cur.moveToNext());
+        }
+        cur.close();
+        return returnHashtags;
+    }
+
+    private List<Hashtag> selectHashtagsForNote(int noteId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Hashtag> returnHashtags = new ArrayList<>();
+
+        Cursor cur = db.rawQuery("SELECT " + COLUMN_ID + ", " + COLUMN_NAME + " FROM " + TABLE_HASHTAGS + " JOIN " + TABLE_NOTES_HASHTAGS + " ON " +
+                TABLE_NOTES_HASHTAGS + "." + COLUMN_HASHTAGS_ID + " = " + TABLE_HASHTAGS + "." + COLUMN_ID + " WHERE " +
+                TABLE_NOTES_HASHTAGS + "." + COLUMN_NOTES_ID + " = ?", new String[] {String.valueOf(noteId)});
+        if(cur.moveToFirst()) {
+            do{
+                int id = Integer.parseInt(cur.getString(0));
+                String name = cur.getString(1);
+                returnHashtags.add(new Hashtag(id,name));
+            } while (cur.moveToNext());
+        }
+        cur.close();
+        return returnHashtags;
+    }
+
     void insertNewNote(Note note) {
         ContentValues values = new ContentValues();
         values.put(COLUMN_TITLE, note.getTitle());
@@ -91,6 +166,33 @@ public class Database extends SQLiteOpenHelper {
         values.put(COLUMN_CHECKBOXES, note.isCheckbox());
         SQLiteDatabase db = getWritableDatabase();
         db.insert(TABLE_NOTES, null, values);
+    }
+
+    void insertNewHashtag(Hashtag hashtag) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME, hashtag.getName());
+        SQLiteDatabase db = getWritableDatabase();
+        db.insert(TABLE_HASHTAGS, null, values);
+    }
+
+    void addHashtagToNote(int noteId, int hashtagId) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NOTES_ID, noteId);
+        values.put(COLUMN_HASHTAGS_ID, hashtagId);
+        SQLiteDatabase db = getWritableDatabase();
+        db.insert(TABLE_NOTES_HASHTAGS, null, values);
+    }
+
+    void removeHashtagFromNote(int noteId, int hashtagId) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_NOTES_HASHTAGS, COLUMN_NOTES_ID + " = ? AND " + COLUMN_HASHTAGS_ID + " = ?",
+                new String[] {String.valueOf(noteId), String.valueOf(hashtagId)});
+    }
+
+    void deleteHashtag(int noteId) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_NOTES_HASHTAGS, COLUMN_HASHTAGS_ID + " = ?", new String[] {String.valueOf(noteId)});
+        db.delete(TABLE_HASHTAGS, COLUMN_ID + " = ?", new String[] {String.valueOf(noteId)});
     }
 
     void updateNote(Note note) {

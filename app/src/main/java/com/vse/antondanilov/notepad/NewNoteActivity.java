@@ -1,5 +1,6 @@
 package com.vse.antondanilov.notepad;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -35,14 +36,17 @@ public class NewNoteActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveNote();
-                finish();
+              //  saveNote();
+             //   finish();
+                Intent intent = new Intent(NewNoteActivity.this, HashtagsActivity.class);
+                intent.putExtra(NOTE_ID, note.getId());
+                startActivity(intent);
             }
         });
     }
 
     private void initUI() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_hashtags);
         setSupportActionBar(toolbar);
         title = (EditText) findViewById(R.id.open_note_title);
         text = (EditText) findViewById(R.id.open_note_text);
