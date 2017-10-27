@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.vse.antondanilov.notepad.MainActivity.NOTE_ID;

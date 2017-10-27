@@ -14,11 +14,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -26,9 +29,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public static Database DB;
     public static String    NOTE_ID = "note_id";
-    private String[] mPlanetTitles;
-    private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_drawer_acitivty);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         DB = new Database(this);
 
@@ -48,32 +47,63 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        generateTableItems();
-
+        generateTableItems(-1);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.setDrawerListener(toggle); //TODO check this
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        createDrawerMenuItems();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         //update
-        generateTableItems();
+
+        createDrawerMenuItems();
+        generateTableItems(-1);
     }
 
-    private void generateTableItems() {
+    private void createDrawerMenuItems() {
+        List<String> list = new ArrayList<>(); //TODO better
+        for (Hashtag hashtag : DB.getHashtags()) {
+            list.add(hashtag.getName());
+        }
+
+        //TODO add "all hashtags", tučně
+
+        ListView lv = (ListView) findViewById(R.id.navigation_list_view);
+
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.item_drawer, list);
+
+        lv.setAdapter(arrayAdapter);
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                generateTableItems((position+1));
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
+    }
+
+    private void generateTableItems(int hashtagId) {
+
         TableLayout table = (TableLayout) this.findViewById(R.id.main_menu_table);
         table.removeAllViews();
 
-        final List<Note> notes = DB.getNotes();
+        final List<Note> notes;
+        if(hashtagId == -1) {
+            notes = DB.getNotes();
+        } else {
+            notes = DB.getNotesForHashtag(hashtagId);
+        }
+
         for(final Note note : notes) {
             LinearLayout tableRow = (LinearLayout) View.inflate(this, R.layout.item_main_menu, null);
 
