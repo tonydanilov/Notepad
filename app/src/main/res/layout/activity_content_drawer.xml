@@ -1,10 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.vse.antondanilov.notepad.NewNoteActivity">
+    android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -12,7 +10,7 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar_hashtags"
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
@@ -20,10 +18,8 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_new_note" />
-
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_hashtag"
+        android:id="@+id/new_note_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -31,14 +27,16 @@
         app:backgroundTint="@color/colorPrimary"
         app:srcCompat="@android:drawable/ic_menu_add" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_color"
-        android:layout_width="134dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="76dp"
-        app:backgroundTint="@color/colorPrimary"
-        app:srcCompat="@android:drawable/ic_menu_add" />
 
-</android.support.design.widget.CoordinatorLayout>
+    <android.support.v4.widget.NestedScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior">
+
+    <include
+        layout="@layout/content_main_menu_table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</android.support.v4.widget.NestedScrollView>
+    </android.support.design.widget.CoordinatorLayout>
+

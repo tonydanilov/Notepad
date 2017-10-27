@@ -3,20 +3,29 @@ package com.vse.antondanilov.notepad;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     public static Database DB;
     public static String    NOTE_ID = "note_id";
@@ -24,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_hashtags);
+        setContentView(R.layout.activity_drawer_acitivty);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         DB = new Database(this);
@@ -34,30 +43,69 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-               //         .setAction("Action", null).show();
-                System.out.println("== NOTE creating new note");
                 showNote(-1);
             }
         });
 
-     generateTableItems();
+        generateTableItems(-1);
+
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle); //TODO check this
+        toggle.syncState();
+
+        createDrawerMenuItems();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         //update
-        generateTableItems();
+
+        createDrawerMenuItems();
+        generateTableItems(-1);
     }
 
-    private void generateTableItems() {
+    private void createDrawerMenuItems() {
+        List<String> list = new ArrayList<>(); //TODO better
+        for (Hashtag hashtag : DB.getHashtags()) {
+            list.add(hashtag.getName());
+        }
+
+        //TODO add "all hashtags", tučně
+
+        ListView lv = (ListView) findViewById(R.id.navigation_list_view);
+
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.item_drawer, list);
+
+        lv.setAdapter(arrayAdapter);
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                generateTableItems((position+1));
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
+    }
+
+    private void generateTableItems(int hashtagId) {
+
         TableLayout table = (TableLayout) this.findViewById(R.id.main_menu_table);
         table.removeAllViews();
 
-        final List<Note> notes = DB.getNotes();
+        final List<Note> notes;
+        if(hashtagId == -1) {
+            notes = DB.getNotes();
+        } else {
+            notes = DB.getNotesForHashtag(hashtagId);
+        }
+
         for(final Note note : notes) {
-            LinearLayout tableRow = (LinearLayout) View.inflate(this, R.layout.main_menu_item, null);
+            LinearLayout tableRow = (LinearLayout) View.inflate(this, R.layout.item_main_menu, null);
 
             Random rand = new Random();
             int k = rand.nextInt(9);
@@ -86,11 +134,20 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(NOTE_ID, noteId);
         startActivity(intent);
     }
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.drawer_acitivty, menu);
         return true;
     }
 
@@ -107,6 +164,31 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     public static Database getDB() {

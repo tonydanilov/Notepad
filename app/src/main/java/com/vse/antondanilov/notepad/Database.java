@@ -79,6 +79,8 @@ public class Database extends SQLiteOpenHelper {
         return selectHashtagsForNote(noteId);
     }
 
+    public List<Note> getNotesForHashtag(int hashtagId) {return selectNotesForHashtag(hashtagId); }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_NOTES_TABLE = "CREATE TABLE " + TABLE_NOTES + "(" +
@@ -86,7 +88,7 @@ public class Database extends SQLiteOpenHelper {
                 COLUMN_TEXT+ " TEXT," + COLUMN_COLOR + " INTEGER," + COLUMN_CHECKBOXES + " BOOLEAN" + ")";
 
         String CREATE_HASHTAGS_TABLE = "CREATE TABLE " + TABLE_HASHTAGS + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_NAME + " TEXT)";
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_NAME + " TEXT)";
 
         String CREATE_NOTES_HASHTAGS_TABLE = "CREATE TABLE " + TABLE_NOTES_HASHTAGS + "(" +
                 COLUMN_NOTES_ID + " INTEGER," + COLUMN_HASHTAGS_ID + " INTEGER, FOREIGN KEY (" + COLUMN_NOTES_ID + ") REFERENCES " +
@@ -157,6 +159,36 @@ public class Database extends SQLiteOpenHelper {
         cur.close();
         return returnHashtags;
     }
+
+    private List<Note> selectNotesForHashtag(int hashtagId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Note> returnNotes = new ArrayList<>();
+
+        Cursor cur = db.rawQuery("SELECT * FROM " + TABLE_NOTES + " JOIN " + TABLE_NOTES_HASHTAGS + " ON " +
+                TABLE_NOTES_HASHTAGS + "." + COLUMN_NOTES_ID + " = " + TABLE_NOTES + "." + COLUMN_ID + " WHERE " +
+                TABLE_NOTES_HASHTAGS + "." + COLUMN_HASHTAGS_ID + " = ?", new String[] {String.valueOf(hashtagId)});
+
+        if(cur.moveToFirst()) {
+            do{
+                int id = Integer.parseInt(cur.getString(0));
+                String title = cur.getString(1);
+                String text = cur.getString(2);
+                int color = Integer.parseInt(cur.getString(3));
+                boolean checkboxes = Boolean.parseBoolean(cur.getString(4));
+                returnNotes.add(new Note(id,title,text,NoteColor.getNoteColorForId(color),checkboxes));
+            } while (cur.moveToNext());
+        }
+        cur.close();
+
+
+        for(Note note : returnNotes) {
+            System.out.println("== NOTE " + note.getId() + ":" + hashtagId);
+        }
+
+        return returnNotes;
+    }
+
+
 
     void insertNewNote(Note note) {
         ContentValues values = new ContentValues();
