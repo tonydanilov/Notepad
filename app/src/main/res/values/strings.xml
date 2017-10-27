@@ -11,4 +11,11 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="drawer_menu_select_all">ALL</string>
+    <string name="dialog_delete_button">Delete</string>
+    <string name="dialog_cancel_button">Cancel</string>
+    <string name="dialog_delete_question">Delete note \"</string>
+    <string name="dialog_ok_button">OK</string>
+    <string name="dialog_delete_question_hashtag">Delete hashtag</string>
+    <string name="pick_color_title">Pick color</string>
 </resources>

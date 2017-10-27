@@ -16,7 +16,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.vse.antondanilov.notepad.MainActivity.NOTE_ID;
@@ -84,8 +83,6 @@ public class HashtagsActivity extends AppCompatActivity {
         table.addView(addButtonLayout);
     }
 
-
-
     private boolean isNotesHashtag(int noteId, int hashtagId) {
         for(Hashtag hashtag : MainActivity.getDB().getHashtagsForNote(noteId)) {
             if(hashtagId == hashtag.getId()) return true;
@@ -98,7 +95,6 @@ public class HashtagsActivity extends AppCompatActivity {
         loadHashtags();
     }
 
-    //TODO to R.string
     private void createAddHashtagDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(HashtagsActivity.this);
         builder.setTitle(getString(R.string.new_hashtag));
@@ -114,7 +110,7 @@ public class HashtagsActivity extends AppCompatActivity {
         }, 50);
         builder.setView(input);
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.dialog_ok_button, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 MainActivity.getDB().insertNewHashtag(new Hashtag(-1, input.getText().toString()));
@@ -122,7 +118,7 @@ public class HashtagsActivity extends AppCompatActivity {
             }
         });
 
-        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(getString(R.string.dialog_cancel_button), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -134,8 +130,8 @@ public class HashtagsActivity extends AppCompatActivity {
     //TODO to R.string
     private void creatDeleteDialog(final Hashtag hashtag) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(HashtagsActivity.this);
-        builder.setTitle("Delete hashtag " + hashtag.getName() + "?");  //TODO
-        builder.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
+        builder.setTitle(getString(R.string.dialog_delete_question_hashtag) + " \"" + hashtag.getName() + "\"?");  //TODO
+        builder.setPositiveButton(getString(R.string.dialog_delete_button), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 deleteHashtag(hashtag.getId());
@@ -143,7 +139,7 @@ public class HashtagsActivity extends AppCompatActivity {
             }
         });
 
-        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(getString(R.string.dialog_cancel_button), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();

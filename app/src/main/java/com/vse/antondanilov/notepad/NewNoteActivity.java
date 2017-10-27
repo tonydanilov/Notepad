@@ -51,7 +51,7 @@ public class NewNoteActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(NewNoteActivity.this);
-                builder.setTitle("Pick color");
+                builder.setTitle(R.string.pick_color_title);
 
                 LinearLayout colorPickerLayout = (LinearLayout) View.inflate(NewNoteActivity.this, R.layout.layout_color_picker, null);
                 for (final NoteColor noteColor : NoteColor.values()) {

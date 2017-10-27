@@ -11,11 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Created by tonyd on 15.10.2017.
- */
-
-public class Database extends SQLiteOpenHelper {
+class Database extends SQLiteOpenHelper {
 
     private static List<Note> notes;
 
@@ -35,7 +31,7 @@ public class Database extends SQLiteOpenHelper {
 
     //TODO všechny sql dotazy do proměnných
 
-    public Database(Context context) {
+    Database(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         generateRandomValues();
         addDefaultHashtags();
@@ -67,19 +63,19 @@ public class Database extends SQLiteOpenHelper {
 
     }
 
-    public List<Note> getNotes(int hashtagId) {
-        return selectNotesForHashtag(hashtagId);
+    List<Note> getNotes(int... hashtagId) {
+        if(hashtagId.length == 0 ) {
+            return selectAllNotes();
+        }
+        return selectNotesForHashtag(hashtagId[0]);
     }
 
-    public List<Note> getNotes() {
-        return selectAllNotes();
-    }
 
-    public List<Hashtag> getHashtags() {
+    List<Hashtag> getHashtags() {
         return selectAllHashtags();
     }
 
-    public List<Hashtag> getHashtagsForNote(int noteId) {
+    List<Hashtag> getHashtagsForNote(int noteId) {
         return selectHashtagsForNote(noteId);
     }
 
