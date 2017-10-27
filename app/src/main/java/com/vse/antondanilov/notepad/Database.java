@@ -67,6 +67,10 @@ public class Database extends SQLiteOpenHelper {
 
     }
 
+    public List<Note> getNotes(int hashtagId) {
+        return selectNotesForHashtag(hashtagId);
+    }
+
     public List<Note> getNotes() {
         return selectAllNotes();
     }
@@ -79,7 +83,6 @@ public class Database extends SQLiteOpenHelper {
         return selectHashtagsForNote(noteId);
     }
 
-    public List<Note> getNotesForHashtag(int hashtagId) {return selectNotesForHashtag(hashtagId); }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -179,18 +182,12 @@ public class Database extends SQLiteOpenHelper {
             } while (cur.moveToNext());
         }
         cur.close();
-
-
-        for(Note note : returnNotes) {
-            System.out.println("== NOTE " + note.getId() + ":" + hashtagId);
-        }
-
         return returnNotes;
     }
 
 
 
-    void insertNewNote(Note note) {
+    int insertNewNote(Note note) {
         ContentValues values = new ContentValues();
         values.put(COLUMN_TITLE, note.getTitle());
         values.put(COLUMN_TEXT, note.getText());
@@ -198,6 +195,8 @@ public class Database extends SQLiteOpenHelper {
         values.put(COLUMN_CHECKBOXES, note.isCheckbox());
         SQLiteDatabase db = getWritableDatabase();
         db.insert(TABLE_NOTES, null, values);
+
+        return selectAllNotes().size(); //==id of last insert
     }
 
     void insertNewHashtag(Hashtag hashtag) {
@@ -221,10 +220,16 @@ public class Database extends SQLiteOpenHelper {
                 new String[] {String.valueOf(noteId), String.valueOf(hashtagId)});
     }
 
-    void deleteHashtag(int noteId) {
+    void deleteHashtag(int hashtagId) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_NOTES_HASHTAGS, COLUMN_HASHTAGS_ID + " = ?", new String[] {String.valueOf(noteId)});
-        db.delete(TABLE_HASHTAGS, COLUMN_ID + " = ?", new String[] {String.valueOf(noteId)});
+        db.delete(TABLE_NOTES_HASHTAGS, COLUMN_HASHTAGS_ID + " = ?", new String[] {String.valueOf(hashtagId)});
+        db.delete(TABLE_HASHTAGS, COLUMN_ID + " = ?", new String[] {String.valueOf(hashtagId)});
+    }
+
+    void deleteNote(int noteId) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_NOTES_HASHTAGS, COLUMN_NOTES_ID + " = ?", new String[] {String.valueOf(noteId)});
+        db.delete(TABLE_NOTES, COLUMN_ID + " = ?", new String[] {String.valueOf(noteId)});
     }
 
     void updateNote(Note note) {

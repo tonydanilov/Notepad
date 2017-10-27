@@ -1,5 +1,6 @@
 package com.vse.antondanilov.notepad;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        generateTableItems(-1);
+        generateTableItems(0);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -65,16 +67,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //update
 
         createDrawerMenuItems();
-        generateTableItems(-1);
+        generateTableItems(0);
     }
 
     private void createDrawerMenuItems() {
         List<String> list = new ArrayList<>(); //TODO better
+
+        list.add("ALL");
         for (Hashtag hashtag : DB.getHashtags()) {
             list.add(hashtag.getName());
         }
-
-        //TODO add "all hashtags", tučně
 
         ListView lv = (ListView) findViewById(R.id.navigation_list_view);
 
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                generateTableItems((position+1));
+                generateTableItems((position));
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 drawer.closeDrawer(GravityCompat.START);
             }
@@ -93,16 +95,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void generateTableItems(int hashtagId) {
-
         TableLayout table = (TableLayout) this.findViewById(R.id.main_menu_table);
         table.removeAllViews();
 
         final List<Note> notes;
-        if(hashtagId == -1) {
-            notes = DB.getNotes();
+        if(hashtagId == 0 ) {
+            notes = MainActivity.getDB().getNotes();
         } else {
-            notes = DB.getNotesForHashtag(hashtagId);
+            notes = MainActivity.getDB().getNotes(hashtagId);
         }
+
 
         for(final Note note : notes) {
             LinearLayout tableRow = (LinearLayout) View.inflate(this, R.layout.item_main_menu, null);
@@ -126,7 +128,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     showNote(notes.indexOf(note));
                 }
             });
+
+            tableRow.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    creatDeleteDialog(note);
+                    return false;
+                }
+            });
         }
+    }
+
+    private void creatDeleteDialog(final Note note) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Delete note \"" + note.getTitle() + "\"?");
+        builder.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                deleteNote(note.getId());
+                generateTableItems(0);
+            }
+        });
+
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void deleteNote(int noteId) {
+        MainActivity.getDB().deleteNote(noteId);
     }
 
     private void showNote(int noteId) {

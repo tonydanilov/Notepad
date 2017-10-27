@@ -26,7 +26,7 @@ public class Note {
     }
 
     public Note(int id, String text, boolean checkbox) {
-        new Note(id, "", text, NoteColor.WHITE, checkbox);
+        new Note(id, "", text, NoteColor.GREY, checkbox);
     }
 
     private int randomizeColor() {
@@ -49,6 +49,10 @@ public class Note {
 
     public String getText() {
         return text;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setTitle(String title) {
@@ -74,6 +78,4 @@ public class Note {
     public void setColor(NoteColor color) {
         this.color = color;
     }
-
-
 }

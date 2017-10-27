@@ -19,9 +19,13 @@
             android:id="@+id/open_note_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@null"
             android:ems="10"
             android:hint="@string/note_title_hint"
             android:inputType="textPersonName"
+            android:padding="10dp"
+            android:textSize="24sp"
+            android:textStyle="bold"
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="0dp" />
 
@@ -29,9 +33,11 @@
             android:id="@+id/open_note_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@null"
             android:ems="10"
             android:hint="@string/note_text_hint"
             android:inputType="textMultiLine"
+            android:padding="10dp"
             tools:layout_editor_absoluteX="7dp"
             tools:layout_editor_absoluteY="43dp" />
     </LinearLayout>

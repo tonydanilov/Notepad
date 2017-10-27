@@ -5,13 +5,12 @@ package com.vse.antondanilov.notepad;
  */
 
 public enum NoteColor {
-    WHITE   (0,"#ffffff"),
-    BLACK   (1,"#000000"),
-    BLUE    (2,"#0000ff"),
-    RED     (3,"#ff0000"),
-    GREEN   (4,"#00ff00"),
-    YELLOW  (5,"#aaaa00"),
-    GREY    (6,"#222222");
+    GREY    (0,"#cccccc"),
+    BLACK   (1,"#000000"),//
+    BLUE    (2,"#0000cc"),
+    RED     (3,"#550000"),//
+    GREEN   (4,"#005500"),//
+    YELLOW  (5,"#bbbb00");
 
     private int id;
     private String hexColor;

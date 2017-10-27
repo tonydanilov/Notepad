@@ -27,7 +27,7 @@ public class NewNoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_note);
 
         if (getIntent().getExtras().getInt(NOTE_ID) == -1) {
-            note = new Note(-1, "", "", NoteColor.WHITE, false);
+            note = new Note(-1, "", "", NoteColor.GREY, false);
         } else {
             note = MainActivity.getDB().getNotes().get(getIntent().getExtras().getInt(NOTE_ID));
         }
@@ -39,8 +39,7 @@ public class NewNoteActivity extends AppCompatActivity {
         fabHashtag.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //  saveNote();
-                //   finish();
+                saveNote();
                 Intent intent = new Intent(NewNoteActivity.this, HashtagsActivity.class);
                 intent.putExtra(NOTE_ID, note.getId());
                 startActivity(intent);
@@ -52,7 +51,7 @@ public class NewNoteActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(NewNoteActivity.this);
-                builder.setTitle("Pick color"); //TODO
+                builder.setTitle("Pick color");
 
                 LinearLayout colorPickerLayout = (LinearLayout) View.inflate(NewNoteActivity.this, R.layout.layout_color_picker, null);
                 for (final NoteColor noteColor : NoteColor.values()) {
@@ -96,13 +95,11 @@ public class NewNoteActivity extends AppCompatActivity {
     }
 
     private void saveNote() {
-        //toolbar.setColor ??
         note.setTitle(title.getText().toString());
         note.setText(text.getText().toString());
 
         if (note.getId() == -1) {
-            note.setColor(NoteColor.RED);
-            MainActivity.getDB().insertNewNote(note);
+            note.setId(MainActivity.getDB().insertNewNote(note));
         } else {
             MainActivity.getDB().updateNote(note);
         }
