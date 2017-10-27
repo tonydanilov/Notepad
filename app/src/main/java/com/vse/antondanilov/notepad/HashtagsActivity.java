@@ -40,7 +40,7 @@ public class HashtagsActivity extends AppCompatActivity {
         table = (TableLayout) this.findViewById(R.id.hashtags_table);
         List<Hashtag> hashtags = MainActivity.getDB().getHashtags();
         for(final Hashtag hashtag : hashtags) {
-            LinearLayout tableRow = (LinearLayout) View.inflate(this, R.layout.hashtags_item, null);
+            LinearLayout tableRow = (LinearLayout) View.inflate(this, R.layout.item_hashtags, null);
 
             //TODO svoje metoda
             CheckBox hashtagCheckbox = tableRow.findViewById(R.id.hashtag_checkbox);
@@ -72,7 +72,7 @@ public class HashtagsActivity extends AppCompatActivity {
             tableRow.setOnLongClickListener(deleteHashtagClickListener);
         }
 
-        LinearLayout addButtonLayout = (LinearLayout) View.inflate(this, R.layout.new_hashtags_item, null);
+        LinearLayout addButtonLayout = (LinearLayout) View.inflate(this, R.layout.item_new_hashtag, null);
         Button addHashtagButton = addButtonLayout.findViewById(R.id.add_hashtag_button);
         addHashtagButton.setOnClickListener(new View.OnClickListener() {
             @Override
