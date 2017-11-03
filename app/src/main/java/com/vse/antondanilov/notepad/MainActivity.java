@@ -22,13 +22,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
+import static com.vse.antondanilov.notepad.Constants.ALL_NOTES;
+import static com.vse.antondanilov.notepad.Constants.NEW_NOTE_DEFAULT_VALUE;
+import static com.vse.antondanilov.notepad.Constants.NOTE_ID;
 
 public class MainActivity extends AppCompatActivity {
-
-    public static Database  DB;
-    public static String    NOTE_ID = "note_id";
-    private static int      NEW_NOTE = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +36,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DB = new Database(this);
+        Database.init(this);
 
         createNewNoteButton();
-        loadNotes();
+        loadNotes(ALL_NOTES);
         createDrawerMenu(toolbar);
     }
 
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         createDrawerMenuItems();
-        loadNotes();
+        loadNotes(ALL_NOTES);
     }
 
     private void createNewNoteButton() {
@@ -56,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         newNoteFloatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showNote(NEW_NOTE);
+                showNote(NEW_NOTE_DEFAULT_VALUE);
             }
         });
     }
@@ -65,22 +64,22 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle); //TODO check this
+        drawer.setDrawerListener(toggle);
         toggle.syncState();
         createDrawerMenuItems();
     }
 
     private void createDrawerMenuItems() {
-        List<String> list = new ArrayList<>(); //TODO better
-
+        List<String> list = new ArrayList<>();
         list.add(getString(R.string.drawer_menu_select_all));
-        for (Hashtag hashtag : DB.getHashtags()) {
+        for (Hashtag hashtag : Database.getInstance(this).getHashtags()) {
             list.add(hashtag.getName());
         }
 
         ListView lv = (ListView) findViewById(R.id.navigation_list_view);
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, R.layout.item_drawer, list);
         lv.setAdapter(arrayAdapter);
+
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -91,30 +90,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void loadNotes(int... hashtagId) {
+    private void loadNotes(int hashtagId) {
         TableLayout table = (TableLayout) this.findViewById(R.id.main_menu_table);
         table.removeAllViews();
 
-        final List<Note> notes;
-        if(hashtagId.length == 0) {
-            notes = MainActivity.getDB().getNotes();
-        } else {
-            notes = MainActivity.getDB().getNotes(hashtagId[0]);
-        }
-
-
+        final List<Note> notes = Database.getInstance(this).getNotes(hashtagId);
         for(final Note note : notes) {
             LinearLayout tableRow = (LinearLayout) View.inflate(this, R.layout.item_main_menu, null);
-
-            Random rand = new Random();
-            int k = rand.nextInt(9);
 
             tableRow.setBackgroundColor(Color.parseColor(note.getHexColor()));
             TextView title = tableRow.findViewById(R.id.note_title);
             TextView noteText = tableRow.findViewById(R.id.note_text);
-
             title.setText(note.getTitle());
-            noteText.setPadding(noteText.getPaddingLeft(), 0,0, k * 100);
             noteText.setText(note.getText());
 
             table.addView(tableRow);
@@ -122,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
             tableRow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showNote(notes.indexOf(note));
+                    showNote(note.getId());
                 }
             });
 
@@ -143,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 deleteNote(note.getId());
-                loadNotes(0);
+                loadNotes(ALL_NOTES);
             }
         });
 
@@ -157,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void deleteNote(int noteId) {
-        MainActivity.getDB().deleteNote(noteId);
+        Database.getInstance(this).deleteNote(noteId);
     }
 
     private void showNote(int noteId) {
@@ -173,9 +160,5 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
-    }
-
-    public static Database getDB() {
-        return DB;
     }
 }

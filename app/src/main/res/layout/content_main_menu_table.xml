@@ -3,7 +3,6 @@
     android:id="@+id/main_menu_table"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
     android:divider="@android:color/white"
     android:dividerPadding="5dp">
 

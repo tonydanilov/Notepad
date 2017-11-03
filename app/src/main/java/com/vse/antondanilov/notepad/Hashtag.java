@@ -1,15 +1,11 @@
 package com.vse.antondanilov.notepad;
 
-/**
- * Created by tonyd on 23.10.2017.
- */
+class Hashtag {
 
-public class Hashtag {
+    private final int id;
+    private final String name;
 
-    private int id;
-    private String name;
-
-    public Hashtag(int id, String name) {
+    Hashtag(int id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -17,7 +13,6 @@ public class Hashtag {
     public int getId() {
         return id;
     }
-
 
     public String getName() {
         return name;

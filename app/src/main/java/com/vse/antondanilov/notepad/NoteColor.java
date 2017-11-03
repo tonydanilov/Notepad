@@ -1,19 +1,15 @@
 package com.vse.antondanilov.notepad;
 
-/**
- * Created by tonyd on 17.10.2017.
- */
-
-public enum NoteColor {
+enum NoteColor {
     GREY    (0,"#cccccc"),
-    BLACK   (1,"#000000"),//
+    BLACK   (1,"#000000"),
     BLUE    (2,"#0000cc"),
-    RED     (3,"#550000"),//
-    GREEN   (4,"#005500"),//
+    RED     (3,"#550000"),
+    GREEN   (4,"#005500"),
     YELLOW  (5,"#bbbb00");
 
-    private int id;
-    private String hexColor;
+    private final int id;
+    private final String hexColor;
 
     NoteColor(int id, String hexColor) {
         this.id = id;
@@ -33,5 +29,9 @@ public enum NoteColor {
             if(noteColor.getId() == id) return noteColor;
         }
         return null;
+    }
+
+    public static NoteColor getDefaultColor() {
+        return GREY;
     }
 }

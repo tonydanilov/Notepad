@@ -12,7 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import static com.vse.antondanilov.notepad.MainActivity.NOTE_ID;
+import static com.vse.antondanilov.notepad.Constants.ALL_NOTES;
+import static com.vse.antondanilov.notepad.Constants.NEW_NOTE_DEFAULT_VALUE;
+import static com.vse.antondanilov.notepad.Constants.NOTE_ID;
 
 public class NewNoteActivity extends AppCompatActivity {
 
@@ -26,10 +28,10 @@ public class NewNoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_note);
 
-        if (getIntent().getExtras().getInt(NOTE_ID) == -1) {
-            note = new Note(-1, "", "", NoteColor.GREY, false);
+        if (getIntent().getExtras().getInt(NOTE_ID) == NEW_NOTE_DEFAULT_VALUE) {
+            note = new Note(NEW_NOTE_DEFAULT_VALUE, "", "", NoteColor.getDefaultColor());
         } else {
-            note = MainActivity.getDB().getNotes().get(getIntent().getExtras().getInt(NOTE_ID));
+            note = Database.getInstance(this).getNotes(ALL_NOTES).get(getIntent().getExtras().getInt(NOTE_ID) - 1);
         }
 
         initUI();
@@ -73,9 +75,10 @@ public class NewNoteActivity extends AppCompatActivity {
                 colorDialog.show();
             }
         });
+        saveNote();
     }
 
-    AlertDialog colorDialog;
+    private AlertDialog colorDialog;
 
     private void hideDialog() {
         if(colorDialog != null) colorDialog.cancel();
@@ -98,10 +101,10 @@ public class NewNoteActivity extends AppCompatActivity {
         note.setTitle(title.getText().toString());
         note.setText(text.getText().toString());
 
-        if (note.getId() == -1) {
-            note.setId(MainActivity.getDB().insertNewNote(note));
+        if (note.getId() == NEW_NOTE_DEFAULT_VALUE) {
+            note.setId(Database.getInstance(this).insertNewNote(note));
         } else {
-            MainActivity.getDB().updateNote(note);
+            Database.getInstance(this).updateNote(note);
         }
 
         refreshNote();

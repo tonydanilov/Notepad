@@ -1,53 +1,27 @@
 package com.vse.antondanilov.notepad;
 
-import java.util.Random;
-
-/**
- * Created by tonyd on 15.10.2017.
- */
-
-public class Note {
+class Note {
     private int id;
     private String title;
     private String text;
-    private boolean checkbox;
     private NoteColor color;
 
-    public Note(int id, String title, String text, NoteColor color, boolean checkbox) {
+    Note(int id, String title, String text, NoteColor color) {
         this.id = id;
         this.title = title;
         this.text = text;
-        this.checkbox = checkbox;
         this.color = color;
-    }
-
-    public Note(int id, String text, NoteColor color, boolean checkbox) {
-        new Note(id, "", text, color, checkbox);
-    }
-
-    public Note(int id, String text, boolean checkbox) {
-        new Note(id, "", text, NoteColor.GREY, checkbox);
-    }
-
-    private int randomizeColor() {
-        Random rand = new Random();
-        int returnColor = 0;
-        for(int i = 0; i<6; i++) {
-            returnColor += (rand.nextInt(9) * Math.pow(10, i));
-        }
-        while(returnColor < 10000000) returnColor *= 10;
-        return returnColor;
     }
 
     public int getId() {
         return id;
     }
 
-    public String getTitle() {
+    String getTitle() {
         return title;
     }
 
-    public String getText() {
+    String getText() {
         return text;
     }
 
@@ -55,23 +29,19 @@ public class Note {
         this.id = id;
     }
 
-    public void setTitle(String title) {
+    void setTitle(String title) {
         this.title = title;
     }
 
-    public void setText(String text) {
+    void setText(String text) {
         this.text = text;
-    }
-
-    public boolean isCheckbox() {
-        return checkbox;
     }
 
     public NoteColor getColor() {
         return color;
     }
 
-    public String getHexColor() {
+    String getHexColor() {
         return color.getHexColor();
     }
 

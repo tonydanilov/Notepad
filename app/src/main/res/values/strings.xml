@@ -1,21 +1,20 @@
 <resources>
     <string name="app_name">Notepad</string>
-    <string name="action_settings">Settings</string>
     <string name="title_activity_new_note">NewNoteActivity</string>
     <string name="note_text_hint">External memory at your service</string>
     <string name="note_title_hint">Name your note</string>
     <string name="title_activity_hashtags_activity">pick hashtag(s)</string>
     <string name="new_hashtag">+new hashtag</string>
-    <string name="title_activity_test">test</string>
-    <string name="title_activity_drawer_acitivty">DrawerAcitivty</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="drawer_menu_select_all">ALL</string>
+    <string name="drawer_menu_select_all">All</string>
     <string name="dialog_delete_button">Delete</string>
     <string name="dialog_cancel_button">Cancel</string>
     <string name="dialog_delete_question">Delete note \"</string>
     <string name="dialog_ok_button">OK</string>
     <string name="dialog_delete_question_hashtag">Delete hashtag</string>
     <string name="pick_color_title">Pick color</string>
+    <string name="app_name_w_description">Notepad - master thesis project</string>
+    <string name="author_name">by Anton Danilov</string>
 </resources>

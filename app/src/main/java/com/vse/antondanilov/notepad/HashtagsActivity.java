@@ -18,7 +18,8 @@ import android.widget.TableLayout;
 
 import java.util.List;
 
-import static com.vse.antondanilov.notepad.MainActivity.NOTE_ID;
+import static com.vse.antondanilov.notepad.Constants.NEW_HASHTAG_DEFAULT_VALUE;
+import static com.vse.antondanilov.notepad.Constants.NOTE_ID;
 
 public class HashtagsActivity extends AppCompatActivity {
 
@@ -38,38 +39,9 @@ public class HashtagsActivity extends AppCompatActivity {
 
     private void loadHashtags() {
         table = (TableLayout) this.findViewById(R.id.hashtags_table);
-        List<Hashtag> hashtags = MainActivity.getDB().getHashtags();
+        List<Hashtag> hashtags = Database.getInstance(this).getHashtags();
         for(final Hashtag hashtag : hashtags) {
-            LinearLayout tableRow = (LinearLayout) View.inflate(this, R.layout.item_hashtags, null);
-
-            //TODO svoje metoda
-            CheckBox hashtagCheckbox = tableRow.findViewById(R.id.hashtag_checkbox);
-            hashtagCheckbox.setText(hashtag.getName());
-            hashtagCheckbox.setChecked(isNotesHashtag(noteId, hashtag.getId()));
-            hashtagCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if(isChecked) {
-                        saveHashtag(hashtag.getId());
-                    } else {
-                        removeHashtagFromNote(hashtag.getId());
-                    }
-
-                }
-            });
-
-            table.addView(tableRow);
-
-            View.OnLongClickListener deleteHashtagClickListener = new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    creatDeleteDialog(hashtag);
-                    return false;
-                }
-            };
-
-            hashtagCheckbox.setOnLongClickListener(deleteHashtagClickListener);
-            tableRow.setOnLongClickListener(deleteHashtagClickListener);
+            table.addView(createCheckbox(hashtag));
         }
 
         LinearLayout addButtonLayout = (LinearLayout) View.inflate(this, R.layout.item_new_hashtag, null);
@@ -83,8 +55,39 @@ public class HashtagsActivity extends AppCompatActivity {
         table.addView(addButtonLayout);
     }
 
+    private CheckBox createCheckbox(final Hashtag hashtag) {
+        LinearLayout tableRow = (LinearLayout) View.inflate(this, R.layout.item_hashtags, null);
+        CheckBox hashtagCheckbox = tableRow.findViewById(R.id.hashtag_checkbox);
+        hashtagCheckbox.setText(hashtag.getName());
+        hashtagCheckbox.setChecked(isNotesHashtag(noteId, hashtag.getId()));
+        hashtagCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked) {
+                    saveHashtag(hashtag.getId());
+                } else {
+                    removeHashtagFromNote(hashtag.getId());
+                }
+
+            }
+        });
+
+        View.OnLongClickListener deleteHashtagClickListener = new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                creatDeleteDialog(hashtag);
+                return false;
+            }
+        };
+
+        hashtagCheckbox.setOnLongClickListener(deleteHashtagClickListener);
+        tableRow.setOnLongClickListener(deleteHashtagClickListener);
+
+        return hashtagCheckbox;
+    }
+
     private boolean isNotesHashtag(int noteId, int hashtagId) {
-        for(Hashtag hashtag : MainActivity.getDB().getHashtagsForNote(noteId)) {
+        for(Hashtag hashtag : Database.getInstance(this).getHashtagsForNote(noteId)) {
             if(hashtagId == hashtag.getId()) return true;
         }
         return false;
@@ -113,7 +116,7 @@ public class HashtagsActivity extends AppCompatActivity {
         builder.setPositiveButton(R.string.dialog_ok_button, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                MainActivity.getDB().insertNewHashtag(new Hashtag(-1, input.getText().toString()));
+                Database.getInstance(HashtagsActivity.this).insertNewHashtag(new Hashtag(NEW_HASHTAG_DEFAULT_VALUE, input.getText().toString()));
                 refreshHashtags();
             }
         });
@@ -127,10 +130,9 @@ public class HashtagsActivity extends AppCompatActivity {
         builder.show();
     }
 
-    //TODO to R.string
     private void creatDeleteDialog(final Hashtag hashtag) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(HashtagsActivity.this);
-        builder.setTitle(getString(R.string.dialog_delete_question_hashtag) + " \"" + hashtag.getName() + "\"?");  //TODO
+        builder.setTitle(getString(R.string.dialog_delete_question_hashtag) + " \"" + hashtag.getName() + "\"?");
         builder.setPositiveButton(getString(R.string.dialog_delete_button), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -149,14 +151,14 @@ public class HashtagsActivity extends AppCompatActivity {
     }
 
     private void saveHashtag(int hashtagId) {
-        MainActivity.getDB().addHashtagToNote(noteId, hashtagId);
+        Database.getInstance(this).addHashtagToNote(noteId, hashtagId);
     }
 
     private void deleteHashtag(int hashtagId) {
-        MainActivity.getDB().deleteHashtag(hashtagId);
+        Database.getInstance(this).deleteHashtag(hashtagId);
     }
 
     private void removeHashtagFromNote(int hashtagId) {
-        MainActivity.getDB().removeHashtagFromNote(noteId, hashtagId);
+        Database.getInstance(this).removeHashtagFromNote(noteId, hashtagId);
     }
 }
