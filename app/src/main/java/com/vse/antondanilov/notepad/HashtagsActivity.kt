@@ -69,6 +69,12 @@ class HashtagsActivity : AppCompatActivity() {
         return hashtagCheckbox
     }
 
+    /**
+     * Function determine if hashtag belong to note
+     * @param noteId identification number of note
+     * @param hashtagId identification number of hashtag
+     * @return Boolean value of true or false expressing belonginess of hashtag to note
+     */
     private fun isNotesHashtag(noteId: Int, hashtagId: Int): Boolean {
         for (hashtag in Database.getInstance(this)!!.getHashtagsForNote(noteId)) {
             if (hashtagId == hashtag.id) return true
@@ -77,7 +83,7 @@ class HashtagsActivity : AppCompatActivity() {
     }
 
     private fun refreshHashtags() {
-        table!!.removeAllViews()
+        table!!.removeAllViews() //removing all views with hashtag from table (list)
         loadHashtags()
     }
 
@@ -93,6 +99,9 @@ class HashtagsActivity : AppCompatActivity() {
         }, 50)
         builder.setView(input)
 
+        /*
+        setting positive button listener for confirming addition of hashtag to note
+         */
         builder.setPositiveButton(R.string.dialog_ok_button) { _, _ ->
             Database.getInstance(this@HashtagsActivity)!!.insertNewHashtag(Hashtag(NEW_HASHTAG_DEFAULT_VALUE, input.text.toString()))
             refreshHashtags()
