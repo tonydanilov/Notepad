@@ -17,13 +17,12 @@ import com.vse.antondanilov.notepad.Constants.NEW_NOTE_DEFAULT_VALUE
 import com.vse.antondanilov.notepad.Constants.NOTE_ID
 
 class NewNoteActivity : AppCompatActivity() {
-
-    private var note: Note? = null
-    private var title: EditText? = null
-    private var text: EditText? = null
-    private var toolbar: Toolbar? = null
-
-    private var colorDialog: AlertDialog? = null
+    
+    private lateinit var title: EditText
+    private lateinit var text: EditText
+    private lateinit var toolbar: Toolbar
+    private lateinit var note: Note
+    private lateinit var colorDialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +31,7 @@ class NewNoteActivity : AppCompatActivity() {
         note = if (intent.extras.getInt(NOTE_ID) == NEW_NOTE_DEFAULT_VALUE) {
             Note(NEW_NOTE_DEFAULT_VALUE, "", "", NoteColor.WHITE)
         } else {
-            Database.getInstance(this)!!.getNotes(ALL_NOTES)[intent.extras.getInt(NOTE_ID) - 1]
+            Database.getInstance(this).getNotes(ALL_NOTES)[intent.extras.getInt(NOTE_ID) - 1]
         }
 
         initUI()
@@ -42,7 +41,7 @@ class NewNoteActivity : AppCompatActivity() {
         fabHashtag.setOnClickListener {
             saveNote()
             val intent = Intent(this@NewNoteActivity, HashtagsActivity::class.java)
-            intent.putExtra(NOTE_ID, note!!.id)
+            intent.putExtra(NOTE_ID, note.id)
             startActivity(intent)
         }
 
@@ -56,22 +55,18 @@ class NewNoteActivity : AppCompatActivity() {
                 val button = Button(this@NewNoteActivity)
                 button.setBackgroundColor(Color.parseColor(noteColor.hexColor))
                 button.setOnClickListener {
-                    note!!.color = noteColor
+                    note.color = noteColor
                     saveNote()
-                    hideDialog()
+                    colorDialog.cancel()
                 }
                 colorPickerLayout.addView(button)
             }
 
             builder.setView(colorPickerLayout)
             colorDialog = builder.create()
-            colorDialog!!.show()
+            colorDialog.show()
         }
         saveNote()
-    }
-
-    private fun hideDialog() {
-        if (colorDialog != null) colorDialog!!.cancel()
     }
 
     private fun initUI() {
@@ -82,26 +77,25 @@ class NewNoteActivity : AppCompatActivity() {
     }
 
     private fun loadNote() {
-        title!!.setText(note!!.title)
-        text!!.setText(note!!.text)
-        toolbar!!.setBackgroundColor(Color.parseColor(note!!.hexColor))
+        title.setText(note.title)
+        text.setText(note.text)
+        toolbar.setBackgroundColor(Color.parseColor(note.hexColor))
     }
 
     private fun saveNote() {
-        note!!.title = title!!.text.toString()
-        note!!.text = text!!.text.toString()
+        note.title = title.text.toString()
+        note.text = text.text.toString()
 
-        if (note!!.id == NEW_NOTE_DEFAULT_VALUE) {
-            note!!.id = Database.getInstance(this)!!.insertNewNote(note!!)
+        if (note.id == NEW_NOTE_DEFAULT_VALUE) {
+            note.id = Database.getInstance(this).insertNewNote(note)
         } else {
-            Database.getInstance(this)!!.updateNote(note!!)
+            Database.getInstance(this).updateNote(note)
         }
-
         refreshNote()
     }
 
     private fun refreshNote() {
-        toolbar!!.setBackgroundColor(Color.parseColor(note!!.hexColor))
+        toolbar.setBackgroundColor(Color.parseColor(note.hexColor))
     }
 
     override fun onBackPressed() {

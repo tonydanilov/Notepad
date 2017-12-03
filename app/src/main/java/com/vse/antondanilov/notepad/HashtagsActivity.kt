@@ -16,6 +16,7 @@ import android.widget.TableLayout
 
 import com.vse.antondanilov.notepad.Constants.NEW_HASHTAG_DEFAULT_VALUE
 import com.vse.antondanilov.notepad.Constants.NOTE_ID
+import java.util.ArrayList
 
 class HashtagsActivity : AppCompatActivity() {
 
@@ -45,7 +46,7 @@ class HashtagsActivity : AppCompatActivity() {
         table!!.addView(addButtonLayout)
     }
 
-    private fun createCheckbox(hashtag: Hashtag): CheckBox {
+    private fun createCheckbox(hashtag: Hashtag): LinearLayout {
         val tableRow = View.inflate(this, R.layout.item_hashtags, null) as LinearLayout
         val hashtagCheckbox = tableRow.findViewById<CheckBox>(R.id.hashtag_checkbox)
         hashtagCheckbox.text = hashtag.hashtagName
@@ -66,7 +67,7 @@ class HashtagsActivity : AppCompatActivity() {
         hashtagCheckbox.setOnLongClickListener(deleteHashtagClickListener)
         tableRow.setOnLongClickListener(deleteHashtagClickListener)
 
-        return hashtagCheckbox
+        return tableRow
     }
 
     /**
@@ -76,10 +77,7 @@ class HashtagsActivity : AppCompatActivity() {
      * @return Boolean value of true or false expressing belonginess of hashtag to note
      */
     private fun isNotesHashtag(noteId: Int, hashtagId: Int): Boolean {
-        for (hashtag in Database.getInstance(this)!!.getHashtagsForNote(noteId)) {
-            if (hashtagId == hashtag.id) return true
-        }
-        return false
+        return Database.getInstance(this).getHashtagsForNote(noteId).any { hashtagId == it.id }
     }
 
     private fun refreshHashtags() {
@@ -103,7 +101,7 @@ class HashtagsActivity : AppCompatActivity() {
         setting positive button listener for confirming addition of hashtag to note
          */
         builder.setPositiveButton(R.string.dialog_ok_button) { _, _ ->
-            Database.getInstance(this@HashtagsActivity)!!.insertNewHashtag(Hashtag(NEW_HASHTAG_DEFAULT_VALUE, input.text.toString()))
+            Database.getInstance(this@HashtagsActivity).insertNewHashtag(Hashtag(NEW_HASHTAG_DEFAULT_VALUE, input.text.toString()))
             refreshHashtags()
         }
 
@@ -119,19 +117,19 @@ class HashtagsActivity : AppCompatActivity() {
             refreshHashtags()
         }
 
-        builder.setNegativeButton(getString(R.string.dialog_cancel_button)) { dialog, _ -> dialog.cancel() }
+        builder.setNegativeButton(getString(R.string.dialog_cancel_button)) { dialog , _ -> dialog.cancel() }
         builder.show()
     }
 
     private fun saveHashtag(hashtagId: Int) {
-        Database.getInstance(this)!!.addHashtagToNote(noteId, hashtagId)
+        Database.getInstance(this).addHashtagToNote(noteId, hashtagId)
     }
 
     private fun deleteHashtag(hashtagId: Int) {
-        Database.getInstance(this)!!.deleteHashtag(hashtagId)
+        Database.getInstance(this).deleteHashtag(hashtagId)
     }
 
     private fun removeHashtagFromNote(hashtagId: Int) {
-        Database.getInstance(this)!!.removeHashtagFromNote(noteId, hashtagId)
+        Database.getInstance(this).removeHashtagFromNote(noteId, hashtagId)
     }
 }

@@ -2,14 +2,9 @@ package com.vse.antondanilov.notepad
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-import com.vse.antondanilov.notepad.DefaultHashtag
-import com.vse.antondanilov.notepad.Hashtag
-import com.vse.antondanilov.notepad.Note
-import com.vse.antondanilov.notepad.NoteColor
 
 import java.util.ArrayList
 
@@ -218,14 +213,14 @@ internal class Database(context: Context) : SQLiteOpenHelper(context, DATABASE_N
         private val REMOVE_HASHTAG_FROM_NOTE = COLUMN_NOTES_ID + " = ? AND " +
                 COLUMN_HASHTAGS_ID + " = ?"
 
-        private var instance: Database? = null
+        private lateinit var instance: Database
 
         fun init(context: Context) {
             instance = Database(context)
         }
 
-        fun getInstance(context: Context): Database? {
-            if (instance == null) init(context)
+        fun getInstance(context: Context): Database {
+            init(context)
             return instance
         }
     }

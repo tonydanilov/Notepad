@@ -12,7 +12,7 @@ internal enum class NoteColor constructor(val id: Int, val hexColor: String) {
     companion object {
 
         fun getNoteColorForId(id: Int): NoteColor? {
-            return values().firstOrNull { it.id == id }
+            return values().first { it.id == id }
         }
     }
 }

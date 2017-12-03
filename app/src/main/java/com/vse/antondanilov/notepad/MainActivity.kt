@@ -63,9 +63,7 @@ class MainActivity : AppCompatActivity() {
     private fun createDrawerMenuItems() {
         val list = ArrayList<String>()
         list.add(getString(R.string.drawer_menu_select_all))
-        for (hashtag in Database.getInstance(this)!!.hashtags) {
-            list.add(hashtag.hashtagName)
-        }
+        Database.getInstance(this).hashtags.mapTo(list) { it.hashtagName }
 
         val lv = findViewById(R.id.navigation_list_view) as ListView
         val arrayAdapter = ArrayAdapter(this, R.layout.item_drawer, list)
@@ -82,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         val table = this.findViewById(R.id.main_menu_table) as TableLayout
         table.removeAllViews()
 
-        val notes = Database.getInstance(this)!!.getNotes(hashtagId)
+        val notes = Database.getInstance(this).getNotes(hashtagId)
         for (note in notes) {
             val tableRow = View.inflate(this, R.layout.item_main_menu, null) as LinearLayout
 
@@ -116,7 +114,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun deleteNote(noteId: Int) {
-        Database.getInstance(this)!!.deleteNote(noteId)
+        Database.getInstance(this).deleteNote(noteId)
     }
 
     private fun showNote(noteId: Int) {
