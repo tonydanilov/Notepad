@@ -55,7 +55,7 @@ public class HashtagsActivity extends AppCompatActivity {
         table.addView(addButtonLayout);
     }
 
-    private CheckBox createCheckbox(final Hashtag hashtag) {
+    private LinearLayout createCheckbox(final Hashtag hashtag) {
         LinearLayout tableRow = (LinearLayout) View.inflate(this, R.layout.item_hashtags, null);
         CheckBox hashtagCheckbox = tableRow.findViewById(R.id.hashtag_checkbox);
         hashtagCheckbox.setText(hashtag.getName());
@@ -83,7 +83,7 @@ public class HashtagsActivity extends AppCompatActivity {
         hashtagCheckbox.setOnLongClickListener(deleteHashtagClickListener);
         tableRow.setOnLongClickListener(deleteHashtagClickListener);
 
-        return hashtagCheckbox;
+        return tableRow;
     }
 
     private boolean isNotesHashtag(int noteId, int hashtagId) {
