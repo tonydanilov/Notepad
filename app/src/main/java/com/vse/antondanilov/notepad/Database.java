@@ -123,7 +123,6 @@ class Database extends SQLiteOpenHelper {
         return selectHashtagsForNote(noteId);
     }
 
-
     private static Database instance;
 
     @Override

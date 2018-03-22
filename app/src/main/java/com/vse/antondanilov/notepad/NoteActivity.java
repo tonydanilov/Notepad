@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import static com.vse.antondanilov.notepad.Constants.ALL_NOTES;
 import static com.vse.antondanilov.notepad.Constants.NEW_NOTE_DEFAULT_VALUE;
 import static com.vse.antondanilov.notepad.Constants.NOTE_ID;
 
@@ -102,13 +101,10 @@ public class NoteActivity extends AppCompatActivity {
         note.setText(text.getText().toString());
 
         if (note.getId() == NEW_NOTE_DEFAULT_VALUE) {
-            System.out.println("inserting " + note.getId());
             note.setId(Database.getInstance(this).insertNewNote(note));
         } else {
-            System.out.println("updating " + note.getId());
             Database.getInstance(this).updateNote(note);
         }
-
         refreshNote();
     }
 

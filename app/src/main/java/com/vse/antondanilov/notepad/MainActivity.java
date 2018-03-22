@@ -53,54 +53,6 @@ public class MainActivity extends AppCompatActivity {
         loadNotes(ALL_NOTES);
     }
 
-    private void createNewNoteButton() {
-        FloatingActionButton newNoteFloatingButton = (FloatingActionButton) findViewById(R.id.new_note_button);
-        newNoteFloatingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showNote(NEW_NOTE_DEFAULT_VALUE);
-            }
-        });
-    }
-
-    private void createDrawerMenu(Toolbar toolbar) {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-        createDrawerMenuItems();
-    }
-
-    private void createDrawerMenuItems() {
-        List<String> list = new ArrayList<>();
-        list.add(getString(R.string.drawer_menu_select_all));
-        for (Hashtag hashtag : Database.getInstance(this).getHashtags()) {
-            list.add(hashtag.getName());
-        }
-
-        ListView lv = (ListView) findViewById(R.id.navigation_list_view);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, R.layout.item_drawer, list);
-        lv.setAdapter(arrayAdapter);
-
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                loadNotes(position);
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                drawer.closeDrawer(GravityCompat.START);
-            }
-        });
-    }
-
-    private void loadNotes(int hashtagId) {
-        ((TableLayout) findViewById(R.id.main_menu_table)).removeAllViews();
-
-        if(loadNotesTask != null) loadNotesTask.cancel(true);
-        loadNotesTask = new LoadNotesTask(new WeakReference<>(this), hashtagId);
-        loadNotesTask.execute();
-    }
-
     private static class LoadNotesTask extends AsyncTask<Void,Note,Void> {
 
         WeakReference<MainActivity> mainActivityWeakReference;
@@ -147,6 +99,54 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void createNewNoteButton() {
+        FloatingActionButton newNoteFloatingButton = (FloatingActionButton) findViewById(R.id.new_note_button);
+        newNoteFloatingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showNote(NEW_NOTE_DEFAULT_VALUE);
+            }
+        });
+    }
+
+    private void createDrawerMenu(Toolbar toolbar) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        createDrawerMenuItems();
+    }
+
+    private void createDrawerMenuItems() {
+        List<String> list = new ArrayList<>();
+        list.add(getString(R.string.drawer_menu_select_all));
+        for (Hashtag hashtag : Database.getInstance(this).getHashtags()) {
+            list.add(hashtag.getName());
+        }
+
+        ListView lv = (ListView) findViewById(R.id.navigation_list_view);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, R.layout.item_drawer, list);
+        lv.setAdapter(arrayAdapter);
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                loadNotes(position);
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
+    }
+
+    private void loadNotes(int hashtagId) {
+        ((TableLayout) findViewById(R.id.main_menu_table)).removeAllViews();
+
+        if(loadNotesTask != null) loadNotesTask.cancel(true);
+        loadNotesTask = new LoadNotesTask(new WeakReference<>(this), hashtagId);
+        loadNotesTask.execute();
     }
 
     private void createDeleteDialog(final Note note) {
