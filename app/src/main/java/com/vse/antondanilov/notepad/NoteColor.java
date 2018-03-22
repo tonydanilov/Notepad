@@ -4,7 +4,7 @@ enum NoteColor {
     GREY    (0,"#cccccc"),
     BLACK   (1,"#000000"),
     BLUE    (2,"#0000cc"),
-    RED     (3,"#550000"),
+    RED     (3,"#881111"),
     GREEN   (4,"#005500"),
     YELLOW  (5,"#bbbb00");
 

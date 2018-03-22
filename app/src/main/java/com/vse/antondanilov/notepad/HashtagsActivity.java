@@ -75,7 +75,7 @@ public class HashtagsActivity extends AppCompatActivity {
         View.OnLongClickListener deleteHashtagClickListener = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                creatDeleteDialog(hashtag);
+                createDeleteDialog(hashtag);
                 return false;
             }
         };
@@ -130,7 +130,7 @@ public class HashtagsActivity extends AppCompatActivity {
         builder.show();
     }
 
-    private void creatDeleteDialog(final Hashtag hashtag) {
+    private void createDeleteDialog(final Hashtag hashtag) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(HashtagsActivity.this);
         builder.setTitle(getString(R.string.dialog_delete_question_hashtag) + " \"" + hashtag.getName() + "\"?");
         builder.setPositiveButton(getString(R.string.dialog_delete_button), new DialogInterface.OnClickListener() {

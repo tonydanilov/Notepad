@@ -18,6 +18,4 @@ class Hashtag {
         return name;
     }
 
-
-
 }

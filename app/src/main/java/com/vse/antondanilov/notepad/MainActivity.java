@@ -3,6 +3,7 @@ package com.vse.antondanilov.notepad;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.support.design.widget.FloatingActionButton;
@@ -20,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +30,8 @@ import static com.vse.antondanilov.notepad.Constants.NEW_NOTE_DEFAULT_VALUE;
 import static com.vse.antondanilov.notepad.Constants.NOTE_ID;
 
 public class MainActivity extends AppCompatActivity {
+
+    private LoadNotesTask loadNotesTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
         createDrawerMenuItems();
     }
@@ -91,32 +95,55 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadNotes(int hashtagId) {
-        TableLayout table = (TableLayout) this.findViewById(R.id.main_menu_table);
-        table.removeAllViews();
+        ((TableLayout) findViewById(R.id.main_menu_table)).removeAllViews();
 
-        final List<Note> notes = Database.getInstance(this).getNotes(hashtagId);
-        for(final Note note : notes) {
-            LinearLayout tableRow = (LinearLayout) View.inflate(this, R.layout.item_main_menu, null);
+        if(loadNotesTask != null) loadNotesTask.cancel(true);
+        loadNotesTask = new LoadNotesTask(new WeakReference<>(this), hashtagId);
+        loadNotesTask.execute();
+    }
 
-            tableRow.setBackgroundColor(Color.parseColor(note.getHexColor()));
+    private static class LoadNotesTask extends AsyncTask<Void,Note,Void> {
+
+        WeakReference<MainActivity> mainActivityWeakReference;
+        int hashtagId;
+
+        LoadNotesTask(WeakReference<MainActivity> mainActivityWeakReference, int hashtagId) {
+            this.hashtagId = hashtagId;
+            this.mainActivityWeakReference = mainActivityWeakReference;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            for(final Note note : Database.getInstance(mainActivityWeakReference.get()).getNotes(hashtagId)) {
+                if(isCancelled()) break;
+                publishProgress(note);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(final Note... note) {
+            LinearLayout tableRow = (LinearLayout) View.inflate(mainActivityWeakReference.get(), R.layout.item_main_menu, null);
+
+            tableRow.setBackgroundColor(Color.parseColor(note[0].getHexColor()));
             TextView title = tableRow.findViewById(R.id.note_title);
             TextView noteText = tableRow.findViewById(R.id.note_text);
-            title.setText(note.getTitle());
-            noteText.setText(note.getText());
+            title.setText(note[0].getTitle());
+            noteText.setText(note[0].getText());
 
-            table.addView(tableRow);
+            ((TableLayout) mainActivityWeakReference.get().findViewById(R.id.main_menu_table)).addView(tableRow);
 
             tableRow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showNote(note.getId());
+                    mainActivityWeakReference.get().showNote(note[0].getId());
                 }
             });
 
             tableRow.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    createDeleteDialog(note);
+                    mainActivityWeakReference.get().createDeleteDialog(note[0]);
                     return false;
                 }
             });
@@ -124,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createDeleteDialog(final Note note) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.dialog_delete_question) + " \"" +note.getTitle() + "\"?");
         builder.setPositiveButton(R.string.dialog_delete_button, new DialogInterface.OnClickListener() {
             @Override
@@ -148,10 +175,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showNote(int noteId) {
-        Intent intent = new Intent(MainActivity.this, NewNoteActivity.class);
+        Intent intent = new Intent(this, NewNoteActivity.class);
         intent.putExtra(NOTE_ID, noteId);
         startActivity(intent);
     }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
