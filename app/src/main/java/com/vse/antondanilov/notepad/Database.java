@@ -1,7 +1,9 @@
 package com.vse.antondanilov.notepad;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -13,6 +15,7 @@ import static com.vse.antondanilov.notepad.Constants.ALL_NOTES;
 
 class Database extends SQLiteOpenHelper {
 
+    private static final String FIRST_USE_ID        = "first_use";
     private static final int    DATABASE_VERSION    = 1;
     private static final String DATABASE_NAME       = "notes_DB";
     private static final String TABLE_NOTES         = "notes";
@@ -60,14 +63,27 @@ class Database extends SQLiteOpenHelper {
 
     private Database(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        addDefaultHashtags();
+        createDefaultHashtags(context);
     }
 
-    private void addDefaultHashtags() {
-        if(getHashtags().size() >= 3) return;
+    private void createDefaultHashtags(Context context) {
+        if(!isFirstUse(context)) return;
         for(DefaultHashtag defaultHashtag : DefaultHashtag.values()) {
             insertNewHashtag(new Hashtag(-1, defaultHashtag.getName()));
         }
+        setFirstUse(context);
+    }
+
+    private boolean isFirstUse(Context context) {
+        SharedPreferences sharedPref = ((Activity) context).getPreferences(Context.MODE_PRIVATE);
+        return sharedPref.getBoolean(FIRST_USE_ID, true);
+    }
+
+    private void setFirstUse(Context context) {
+        SharedPreferences sharedPref = ((Activity) context).getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(FIRST_USE_ID, false);
+        editor.apply();
     }
 
     List<Note> getNotes(int hashtagId) {
