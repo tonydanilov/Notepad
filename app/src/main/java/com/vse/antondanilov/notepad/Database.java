@@ -6,11 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.vse.antondanilov.notepad.DefaultHashtag;
-import com.vse.antondanilov.notepad.Hashtag;
-import com.vse.antondanilov.notepad.Note;
-import com.vse.antondanilov.notepad.NoteColor;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +56,9 @@ class Database extends SQLiteOpenHelper {
     private static final String REMOVE_HASHTAG_FROM_NOTE = COLUMN_NOTES_ID + " = ? AND " +
             COLUMN_HASHTAGS_ID + " = ?";
 
-    Database(Context context) {
+    private static final String MAX_NOTE_ID = "SELECT MAX(" + COLUMN_ID + ") FROM " + TABLE_NOTES;
+
+    private Database(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         addDefaultHashtags();
     }
@@ -78,6 +75,28 @@ class Database extends SQLiteOpenHelper {
             return selectAllNotes();
         }
         return selectNotesForHashtag(hashtagId);
+    }
+
+    Note getNoteForId(int id) {
+        for(Note note : selectAllNotes()) {
+            if(note.getId() == id) return note;
+        }
+        return null;
+    }
+
+    private int getMaxNoteId() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int maxId = 0;
+
+        Cursor cur = db.rawQuery(MAX_NOTE_ID, null);
+        if(cur.moveToFirst()) {
+            do{
+                maxId = Integer.parseInt(cur.getString(0));
+
+            } while (cur.moveToNext());
+        }
+        cur.close();
+        return maxId;
     }
 
     List<Hashtag> getHashtags() {
@@ -104,11 +123,11 @@ class Database extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public static void init(Context context) {
+    static void init(Context context) {
         instance = new Database(context);
     }
 
-    public static Database getInstance(Context context) {
+    static Database getInstance(Context context) {
         if(instance == null) init(context);
         return instance;
     }
@@ -190,7 +209,7 @@ class Database extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         db.insert(TABLE_NOTES, null, values);
 
-        return selectAllNotes().size(); //==id of last insert
+        return getMaxNoteId();
     }
 
     void insertNewHashtag(Hashtag hashtag) {

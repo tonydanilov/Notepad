@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.vse.antondanilov.notepad.NewNoteActivity">
+    tools:context="com.vse.antondanilov.notepad.NoteActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -16,7 +16,6 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            android:contextClickable="false"
             app:popupTheme="@style/AppTheme.PopupOverlay"
             app:title="Note" />
 
@@ -39,6 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="16dp"
+        android:layout_marginRight="76dp"
         android:layout_marginEnd="76dp"
         app:backgroundTint="@color/colorPrimary"
         app:srcCompat="@color/colorAccent" />

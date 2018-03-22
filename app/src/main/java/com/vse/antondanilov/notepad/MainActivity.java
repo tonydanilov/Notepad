@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
         Database.init(this);
 
         createNewNoteButton();
-        loadNotes(ALL_NOTES);
         createDrawerMenu(toolbar);
     }
 
@@ -175,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showNote(int noteId) {
-        Intent intent = new Intent(this, NewNoteActivity.class);
+        Intent intent = new Intent(this, NoteActivity.class);
         intent.putExtra(NOTE_ID, noteId);
         startActivity(intent);
     }

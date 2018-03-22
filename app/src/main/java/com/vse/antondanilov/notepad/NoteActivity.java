@@ -16,7 +16,7 @@ import static com.vse.antondanilov.notepad.Constants.ALL_NOTES;
 import static com.vse.antondanilov.notepad.Constants.NEW_NOTE_DEFAULT_VALUE;
 import static com.vse.antondanilov.notepad.Constants.NOTE_ID;
 
-public class NewNoteActivity extends AppCompatActivity {
+public class NoteActivity extends AppCompatActivity {
 
     private Note note;
     private EditText title;
@@ -31,7 +31,7 @@ public class NewNoteActivity extends AppCompatActivity {
         if (getIntent().getExtras().getInt(NOTE_ID) == NEW_NOTE_DEFAULT_VALUE) {
             note = new Note(NEW_NOTE_DEFAULT_VALUE, "", "", NoteColor.getDefaultColor());
         } else {
-            note = Database.getInstance(this).getNotes(ALL_NOTES).get(getIntent().getExtras().getInt(NOTE_ID) - 1);
+            note = Database.getInstance(this).getNoteForId(getIntent().getExtras().getInt(NOTE_ID));
         }
 
         initUI();
@@ -42,7 +42,7 @@ public class NewNoteActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 saveNote();
-                Intent intent = new Intent(NewNoteActivity.this, HashtagsActivity.class);
+                Intent intent = new Intent(NoteActivity.this, HashtagsActivity.class);
                 intent.putExtra(NOTE_ID, note.getId());
                 startActivity(intent);
             }
@@ -52,12 +52,12 @@ public class NewNoteActivity extends AppCompatActivity {
         fabColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(NewNoteActivity.this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(NoteActivity.this);
                 builder.setTitle(R.string.pick_color_title);
 
-                LinearLayout colorPickerLayout = (LinearLayout) View.inflate(NewNoteActivity.this, R.layout.layout_color_picker, null);
+                LinearLayout colorPickerLayout = (LinearLayout) View.inflate(NoteActivity.this, R.layout.layout_color_picker, null);
                 for (final NoteColor noteColor : NoteColor.values()) {
-                    Button button = new Button(NewNoteActivity.this);
+                    Button button = new Button(NoteActivity.this);
                     button.setBackgroundColor(Color.parseColor(noteColor.getHexColor()));
                     button.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -102,8 +102,10 @@ public class NewNoteActivity extends AppCompatActivity {
         note.setText(text.getText().toString());
 
         if (note.getId() == NEW_NOTE_DEFAULT_VALUE) {
+            System.out.println("inserting " + note.getId());
             note.setId(Database.getInstance(this).insertNewNote(note));
         } else {
+            System.out.println("updating " + note.getId());
             Database.getInstance(this).updateNote(note);
         }
 
